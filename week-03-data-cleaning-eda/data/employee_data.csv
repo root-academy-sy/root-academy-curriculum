@@ -1,0 +1,14 @@
+employee_id,name,department,score,attendance,salary
+1,Ali,IT,88,92,52000
+2,Maya,HR,74,85,48000
+3,Omar,Finance,91,90,61000
+4,Lina,IT,,78,50000
+5,Sara,HR,95,,55000
+1,Ali,IT,88,92,52000
+6,Youssef,I.T.,79,88,51000
+7,Nour,Human Resources,83,91,49500
+8,Karim,FINANCE,67,75,45000
+9,Dana, IT ,90,95,53000
+10,Rami,Information Technology,72,80,47000
+11,Huda,HR,88,89,50500
+12,Tarek,Finance,60,70,42000
