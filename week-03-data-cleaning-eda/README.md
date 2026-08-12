@@ -236,22 +236,43 @@ import pandas as pd
 
 df = pd.read_csv("data/employee_data.csv")
 
+# Clean column names
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+# Drop rows with no employee_id (essential field)
+df = df.dropna(subset=["employee_id"])
+
+# Remove duplicates
 df = df.drop_duplicates()
 
+# Clean department text
 df["department"] = df["department"].str.strip().str.upper()
 df["department"] = df["department"].replace({
     "HUMAN RESOURCES": "HR",
     "INFORMATION TECHNOLOGY": "IT",
-    "I.T.": "IT"
+    "I.T.": "IT",
+    "I T": "IT"
 })
 
+# Fix attendance (remove % sign) and convert types
+df["attendance"] = df["attendance"].astype(str).str.replace("%", "", regex=False)
 df["score"] = pd.to_numeric(df["score"], errors="coerce")
 df["attendance"] = pd.to_numeric(df["attendance"], errors="coerce")
 
+# Fix salary (remove comma) and convert type
+df["salary"] = df["salary"].astype(str).str.replace(",", "", regex=False)
+df["salary"] = pd.to_numeric(df["salary"], errors="coerce")
+
+# Treat impossible values as missing before filling
+df.loc[(df["score"] < 0) | (df["score"] > 100), "score"] = pd.NA
+df.loc[df["attendance"] > 100, "attendance"] = pd.NA
+
+# Fill missing values with median
 df["score"] = df["score"].fillna(df["score"].median())
 df["attendance"] = df["attendance"].fillna(df["attendance"].median())
+df["salary"] = df["salary"].fillna(df["salary"].median())
 
+# Create new columns
 def performance_category(score):
     if score >= 90:
         return "Excellent"
@@ -264,8 +285,10 @@ def performance_category(score):
 
 df["performance_category"] = df["score"].apply(performance_category)
 
+# Answer EDA questions
 print(df.groupby("department")["score"].mean())
 print(df["performance_category"].value_counts())
+print("Score-attendance correlation:", df["score"].corr(df["attendance"]))
 ```
 
 ## 18. EDA Checklist
