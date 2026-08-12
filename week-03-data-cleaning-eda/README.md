@@ -122,6 +122,15 @@ Students should inspect duplicates before removing them. Sometimes repeated rows
 
 ## 10. Cleaning Text Values
 
+Before cleaning, it helps to look at what is actually inside a column. This is how we spot the problem in the first place.
+
+```python
+print(df["department"].unique())
+print(df["department"].value_counts())
+```
+
+This might show something like `IT`, `it`, `I.T.`, and `Information Technology` — four different spellings of the same department. Now that we've seen the problem, we can fix it.
+
 ```python
 df["department"] = df["department"].str.strip()
 df["department"] = df["department"].str.upper()
@@ -160,6 +169,8 @@ print(very_high_scores)
 ```
 
 For a score column expected to be between 0 and 100, values below 0 or above 100 are probably invalid.
+
+**Common mistake:** Don't delete an outlier just because it looks big or unusual. First check if it's realistic. An age of 250 is clearly an error, but a salary that looks unusually high might just belong to a senior employee. Investigate before deciding.
 
 ## 13. Creating New Columns
 
@@ -201,7 +212,14 @@ print(department_summary)
 
 attendance_summary = df.groupby("attendance_flag")["score"].mean()
 print(attendance_summary)
+
+correlation = df["score"].corr(df["attendance"])
+print(correlation)
 ```
+
+The correlation is a number between -1 and 1. A value close to 1 means high attendance tends to go with high scores. A value close to 0 means there isn't much of a relationship. This directly answers the question from section 14: is attendance related to performance?
+
+**Common mistake:** Don't fill in missing values right away without asking why they're missing. A missing score might be random, or it might mean something specific, like an employee who joined too recently to be reviewed. Think about the reason before choosing fillna or dropna.
 
 ## 16. Writing EDA Notes
 
@@ -234,13 +252,35 @@ df["attendance"] = pd.to_numeric(df["attendance"], errors="coerce")
 df["score"] = df["score"].fillna(df["score"].median())
 df["attendance"] = df["attendance"].fillna(df["attendance"].median())
 
+def performance_category(score):
+    if score >= 90:
+        return "Excellent"
+    elif score >= 80:
+        return "Good"
+    elif score >= 60:
+        return "Satisfactory"
+    else:
+        return "Needs Improvement"
+
 df["performance_category"] = df["score"].apply(performance_category)
 
 print(df.groupby("department")["score"].mean())
 print(df["performance_category"].value_counts())
 ```
 
-## 18. Week 3 Summary
+## 18. EDA Checklist
+
+Before considering your notebook complete, check that you can answer all of these:
+
+- [ ] How many rows and columns does the dataset have?
+- [ ] Which columns had missing values, and what did you do about them?
+- [ ] Were there any duplicate rows? Did you remove them?
+- [ ] Are all columns the correct data type (numbers as numbers, dates as dates)?
+- [ ] Did you find any outliers? What did you decide to do with them?
+- [ ] Did you answer at least three of the analytical questions from section 14?
+- [ ] Did you write short notes explaining your decisions?
+
+## 19. Week 3 Summary
 
 Week 3 focused on the practical workflow of data cleaning and exploratory data analysis. Students learned how to inspect data, clean common issues, create useful columns, ask analytical questions, and organize findings in a notebook. These skills prepare students for Week 4, where they will turn analysis results into visual reports.
 
